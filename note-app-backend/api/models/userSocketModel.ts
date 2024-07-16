@@ -1,15 +1,15 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IUserSocket extends Document {
-    userId: string;
-    socketId: string;
+    userId: Schema.Types.ObjectId;
+    socketId: string | null;
 }
 
-const userSocketSchema = new Schema({
+const userSocketSchema = new Schema<IUserSocket>({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
-    socketId: { type: Schema.Types.ObjectId, default: null, required: false},
+    socketId: { type: Schema.Types.String, default: null, required: false },
 });
 
-const UserSocket = mongoose.model<IUserSocket>('UserSocket', userSocketSchema);
+const UserSocket: Model<IUserSocket> = mongoose.model<IUserSocket>('UserSocket', userSocketSchema);
 
 export default UserSocket;

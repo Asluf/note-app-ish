@@ -12,7 +12,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, setToken } = useTokenContext();
+  const { token, setToken, setUserId } = useTokenContext();
   const noteContext = useContext(NoteContext);
 
   if (!noteContext) {
@@ -33,8 +33,11 @@ const Login: React.FC = () => {
     try {
       const response = await AuthService.login(email, password);
       const tk = response.data.token;
+      const userId = response.data.userId;
       setToken(tk);
+      setUserId(userId);
       localStorage.setItem('token', tk);
+      localStorage.setItem('userId', userId);
       fetchProjectInitial(tk);
       navigate("/dashboard");
     } catch (error) {

@@ -30,8 +30,7 @@ const login = async (req: Request, res: Response) => {
             return res.send({ success: false, message: "Invalid password"}); 
         }
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-        console.log(token);
-        res.send({ success: true, token: token });
+        res.send({ success: true, token: token, userId:user._id });
     } catch (error) {
         res.send({ success: false, message: "An unknown error occurred" });
     }

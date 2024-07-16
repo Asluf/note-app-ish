@@ -23,7 +23,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "ts-node-dev --respawn --transpile-only server.ts",
+    "start": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

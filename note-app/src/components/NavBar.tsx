@@ -9,7 +9,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ path,onChatButtonClick }) => {
   const navigate = useNavigate();
-  const { setToken } = useTokenContext();
+  const { setToken, setUserId } = useTokenContext();
 
   const handleLogout = async () => {
     const { isConfirmed } = await Swal.fire({
@@ -25,6 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({ path,onChatButtonClick }) => {
     if (isConfirmed) {
       try {
         setToken('');
+        setUserId('');
         localStorage.clear();
         navigate('/login');
       } catch (error) {

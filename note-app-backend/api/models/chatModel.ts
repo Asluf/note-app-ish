@@ -1,17 +1,17 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface Chat extends Document {
-    sender: string;
-    receiver: string;
-    message: string;
+export interface IChat {
+    senderId: Schema.Types.ObjectId;
+    receiverId: Schema.Types.ObjectId;
+    content: string;
     timestamp: Date;
 }
 
 const chatSchema = new Schema({
-    sender: { type: Schema.Types.ObjectId, ref: 'User' },
-    receiver: { type: Schema.Types.ObjectId, ref: 'User' },
-    message: String,
+    senderId: { type: Schema.Types.ObjectId, ref: 'User' },
+    receiverId: { type: Schema.Types.ObjectId, ref: 'User' },
+    content: { type: String, required: false},
     timestamp: { type: Date, default: Date.now }
 });
 
-export default mongoose.model<Chat>('Chat', chatSchema);
+export default mongoose.model<IChat>('Chat', chatSchema);

@@ -11,12 +11,13 @@ const Signup: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
-  const {token, setToken} = useTokenContext();
+  const {token, setToken,setUserId} = useTokenContext();
 
   useEffect(() => {
     if (token || token !== '') {
       localStorage.clear();
       setToken('');
+      setUserId('');
     }
   }, []);
 
