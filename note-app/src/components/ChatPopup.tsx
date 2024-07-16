@@ -1,11 +1,22 @@
 import React, { useState} from "react";
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:8080');
 
 const ChatPopup: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [message, setMessage] = useState("");
-
+  
   const handleSendMessage = () => {
     if (message.trim()) {
+      const msg = {
+        // senderId: username,
+        // recipientId: recipient,
+        // timestamp: Date.now,
+        // content: message,
+        readStatus: false
+      }
+      socket.emit('send_message', msg);
       setMessages([...messages, message]);
       setMessage("");
     }

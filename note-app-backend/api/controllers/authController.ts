@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/userModel';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import UserSocket from '../models/userSocketModel';
 
 const signup = async (req: Request, res: Response) => {
     try {
@@ -9,6 +10,8 @@ const signup = async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 12);
         const user = new User({ email, password: hashedPassword });
         await user.save();
+        const userSocket = new UserSocket({userId:user._id});
+        await userSocket.save();
         res.send({ success: true, message: "User created" });
     } catch (error) {
         res.send({ success: false, message: "An unknown error occurred" });   

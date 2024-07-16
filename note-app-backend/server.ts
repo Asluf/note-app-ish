@@ -39,7 +39,8 @@ io.on("connection", (socket) => {
   console.log("A user connected");
 
   socket.on("message", (data) => {
-    io.emit("message", data); // Broadcast message to all connected clients
+    console.log(data.token, data.content);
+    io.emit("message", data.content); // Broadcast message to all connected clients
   });
 
   socket.on("disconnect", () => {

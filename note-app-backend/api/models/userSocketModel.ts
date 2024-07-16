@@ -7,7 +7,7 @@ export interface IUserSocket extends Document {
 
 const userSocketSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
-    socketId: { type: Schema.Types.ObjectId},
+    socketId: { type: Schema.Types.ObjectId, default: null, required: false},
 });
 
 const UserSocket = mongoose.model<IUserSocket>('UserSocket', userSocketSchema);

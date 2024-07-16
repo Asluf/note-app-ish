@@ -35,19 +35,17 @@ const Signup: React.FC = () => {
     }
     try {
       const response = await AuthService.signup(email, password);
-      console.log('Signup successful:', response.data);
-      // Optionally, you can redirect or show a success message here
-      Swal.fire({
-        icon: 'success',
-        title: 'Signup Successful!',
-        text: 'You have successfully signed up.',
-      }).then((result) => {
-        // Redirect to dashboard after successful signup
-        if (result.isConfirmed || result.isDismissed) {
-          window.location.href = '/dashboard'; // Redirect using window location
-          // You can also use history.push('/dashboard') if you have access to history
-        }
-      });
+      if (response.data.success){
+        Swal.fire({
+          icon: 'success',
+          title: 'Signup Successful!',
+          text: 'You have successfully signed up.',
+        }).then((result) => {
+          if (result.isConfirmed || result.isDismissed) {
+            window.location.href = '/login'; 
+          }
+        });
+      }  
     } catch (error) {
       console.error('Signup error:', error);
       setError('Signup failed. Please try again.');
