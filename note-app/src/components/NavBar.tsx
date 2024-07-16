@@ -4,9 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTokenContext } from '../contexts/TokenContext';
 interface NavbarProps {
   path: string;
+  onChatButtonClick: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ path }) => {
+const Navbar: React.FC<NavbarProps> = ({ path,onChatButtonClick }) => {
   const navigate = useNavigate();
   const { setToken } = useTokenContext();
 
@@ -83,8 +84,8 @@ const Navbar: React.FC<NavbarProps> = ({ path }) => {
           </>
         ) : path === '/dashboard' ? (
           <>
-            <button
-              // onClick={}
+             <button
+              onClick={onChatButtonClick}
               className="py-2 px-5 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-brown-900 text-white hover:bg-brown-600"
             >
               Chat

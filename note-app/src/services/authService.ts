@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useTokenContext } from '../contexts/TokenContext';
+
 
 const API_URL = 'http://localhost:8080/auth';
 
@@ -25,21 +25,4 @@ export class AuthService {
             withCredentials: true
         });
     }
-    // public static async logout(): Promise<any> {
-    //     try {
-    //         const { setToken } = useTokenContext();
-    //         setToken('');
-    //         localStorage.clear();
-    //         return true;
-    //         // await axios.post(`${API_URL}/logout`, {
-    //         //     withCredentials: true
-    //         // });
-            
-
-    //     } catch (error) {
-    //         console.error('Logout error:', error);
-    //         throw error;
-    //     }
-    // }
-
 }
