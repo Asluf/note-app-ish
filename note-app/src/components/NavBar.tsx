@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTokenContext } from '../contexts/TokenContext';
 interface NavbarProps {
   path: string;
-  onChatButtonClick: () => void;
+  onChatButtonClick?: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ path,onChatButtonClick }) => {

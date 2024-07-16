@@ -6,9 +6,9 @@ const getChats = async (req: Request, res: Response) => {
     try {
         const userId = req.params.userId;
         const chats = await Chat.find({ $or: [{ sender: userId }, { receiver: userId }] });
-        res.json(chats);
+        res.send({ success: true, chats });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch chats' });
+        res.send({ success: false ,message: 'Failed to fetch chats' });
     }
 };
 
@@ -18,9 +18,9 @@ const sendChat = async (req: Request, res: Response) => {
         const { sender, receiver, message } = req.body;
         const newChat = new Chat({ sender, receiver, message });
         await newChat.save();
-        res.status(201).json({ message: 'Chat sent successfully', chat: newChat });
+        res.send({ sucess: true,message: 'Chat sent successfully', chat: newChat });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to send chat' });
+        res.send({ sucess: false,message: 'Failed to send chat' });
     }
 };
 
