@@ -7,22 +7,25 @@ import Signup from "./components/Signup";
 import Home from "./components/Home";
 import Dashboard from "./components/Dashboard"
 import { TokenProvider } from "./contexts/TokenContext";
-import Chat from "./components/ChatPopup";
+import Chat from "./components/Chat/ChatList";
+import { ChatProvider } from "./contexts/ChatContext";
 
 const App: React.FC = () => {
   return (
     <TokenProvider>
-      <NoteProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat" element={<Chat />} />
-          </Routes>
-        </Router>
-      </NoteProvider>
+      <ChatProvider>
+        <NoteProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Routes>
+          </Router>
+        </NoteProvider>
+      </ChatProvider>
+
     </TokenProvider>
   );
 };

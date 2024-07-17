@@ -5,6 +5,7 @@ import { login } from '../controllers/authController';
 
 const router = express.Router();
 
+
 router.post('/notes', authenticateJWT, createNote);
 router.get('/notes', authenticateJWT, getNotes);
 router.put('/notes/:id', authenticateJWT, updateNote);

@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Swal from 'sweetalert2';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTokenContext } from '../contexts/TokenContext';
+import { ChatContext } from '../contexts/ChatContext';
 interface NavbarProps {
   path: string;
   onChatButtonClick?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ path,onChatButtonClick }) => {
+const Navbar: React.FC<NavbarProps> = ({ path, onChatButtonClick }) => {
   const navigate = useNavigate();
   const { setToken, setUserId } = useTokenContext();
 

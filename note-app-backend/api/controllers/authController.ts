@@ -6,9 +6,9 @@ import UserSocket from '../models/userSocketModel';
 
 const signup = async (req: Request, res: Response) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, username } = req.body;
         const hashedPassword = await bcrypt.hash(password, 12);
-        const user = new User({ email, password: hashedPassword });
+        const user = new User({ email, password: hashedPassword, username:username });
         await user.save();
         const userSocket = new UserSocket({userId:user._id});
         await userSocket.save();

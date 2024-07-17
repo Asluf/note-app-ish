@@ -1,12 +1,23 @@
-import React, { useState} from "react";
+import React, { useContext, useState } from "react";
 import io from 'socket.io-client';
+import { ChatContext } from "../../contexts/ChatContext";
 
-// const socket = io('http://localhost:8080');
+interface ChatMessageProps {
+  userId: string;
+}
 
-const ChatPopup: React.FC = () => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ userId }) => {
   const [messages, setMessages] = useState<string[]>([]);
   const [message, setMessage] = useState("");
-  
+
+  const chatContext = useContext(ChatContext);
+
+  if (!chatContext) {
+    throw new Error('Chat must be used within a NoteProvider');
+  }
+
+  const { currentChat } = chatContext;
+
   const handleSendMessage = () => {
     if (message.trim()) {
       const msg = {
@@ -24,10 +35,11 @@ const ChatPopup: React.FC = () => {
 
   return (
     <div className="absolute right-0 top-[60px] h-[600px] w-[300px] bg-brown-200 shadow-lg p-4 z-50 rounded-lg flex flex-col">
-      <h2 className="text-xl font-bold mb-4">Chat</h2>
+      <h2 className="text-lg font-bold mb-2">{currentChat?.user1._id == userId ? currentChat?.user2.username : currentChat?.user1.username}</h2>
+      <span className="w-[100%] bg-brown-500 h-[1px]"></span>
       <div className="flex-grow overflow-y-auto mb-4">
-        {messages.map((msg, index) => (
-          <div key={index} className="p-2 bg-white mb-2 rounded">
+        {messages.map((msg) => (
+          <div className="p-2 bg-white mb-2 rounded">
             {msg}
           </div>
         ))}
@@ -51,4 +63,4 @@ const ChatPopup: React.FC = () => {
   );
 };
 
-export default ChatPopup;
+export default ChatMessage;

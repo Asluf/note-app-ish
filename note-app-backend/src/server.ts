@@ -8,12 +8,12 @@ import { Server } from "socket.io";
 import noteRoutes from "../api/routes/noteRoutes";
 import authRoutes from "../api/routes/authRoutes";
 import chatRoutes from "../api/routes/chatRoutes";
-import UserSocket, { IUserSocket } from "../api/models/userSocketModel";
-import { IChat } from "../api/models/chatModel";
+import UserSocket from "../api/models/userSocketModel";
+import Chat, { IMessage } from "../api/models/chatModel";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 9000;
+const PORT = process.env.PORT ?? 9000;
 
 app.use(
   cors({
@@ -72,12 +72,31 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('send_message', async (msg) => {
+  socket.on('send_message', async (data: IMessage) => {
     try {
-      console.log(msg);
-      const user = await UserSocket.findOne({ userId: msg.receiverId });
+      const user = await UserSocket.findOne({ userId: data.receiverId });
       if (user && user.socketId) {
-        io.to(user.socketId).emit('receive_message', msg);
+        io.to(user.socketId).emit('receive_message', data);
+      }
+      // storing in the db
+      let chat = await Chat.findOne({
+        $or: [
+          { user1: data.senderId, user2: data.receiverId },
+          { user1: data.receiverId, user2: data.senderId }
+        ]
+      });
+
+      if (chat) {
+        chat.timestamp = new Date();
+        chat.messages.push(data);
+        await chat.save();
+      } else {
+        chat = new Chat({
+          user1: data.senderId,
+          user2: data.receiverId,
+          messages: [data]
+        });
+        await chat.save();
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -88,3 +107,16 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+
+
+/*
+implement chat recipient list Ui
+implement chat inside ui
+
+implement context for store chat recipient with latest msg
+implement context for store all the messages inside previous context when going inside the chat  -> future implement fetch last 20 msgs only and fetch if scroll to old
+
+when sending msg need to store locally also. merge with previous.
+implement receive msg socket listener to merge the new msg.
+*/

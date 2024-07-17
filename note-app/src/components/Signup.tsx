@@ -6,7 +6,9 @@ import Navbar from './NavBar';
 import { useTokenContext } from '../contexts/TokenContext';
 
 const Signup: React.FC = () => {
+
   const [email, setEmail] = useState('');
+  const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ const Signup: React.FC = () => {
       return;
     }
     try {
-      const response = await AuthService.signup(email, password);
+      const response = await AuthService.signup(email, password, userName);
       if (response.data.success){
         Swal.fire({
           icon: 'success',
@@ -76,6 +78,17 @@ const Signup: React.FC = () => {
                 className="w-[80%] py-2 px-3 rounded-lg bg-brown-100"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex w-[100%] gap-2 mb-6 items-center">
+              <label htmlFor="email" className="w-[20%]">Username</label>
+              <input
+                type="text"
+                id="username"
+                className="w-[80%] py-2 px-3 rounded-lg bg-brown-100"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
                 required
               />
             </div>

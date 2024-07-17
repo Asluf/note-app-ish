@@ -16,16 +16,17 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 // export default mongoose.model<IChat>('Chat', chatSchema);
 
-interface IMessage {
+export interface IMessage {
     _id: Schema.Types.ObjectId;
-    sender: Schema.Types.ObjectId;
-    receiver: Schema.Types.ObjectId;
+    senderId: Schema.Types.ObjectId;
+    receiverId: Schema.Types.ObjectId;
     content: string;
     timestamp: Date;
     readReceipt: boolean;
 }
 
 export interface IChat{
+    _id: Schema.Types.ObjectId;
     user1: Schema.Types.ObjectId;
     user2: Schema.Types.ObjectId;
     timestamp: Date;
@@ -35,8 +36,8 @@ export interface IChat{
 }
 
 const messageSchema = new Schema({
-    sender: { type: Schema.Types.ObjectId, ref: 'User' },
-    receiver: { type: Schema.Types.ObjectId, ref: 'User' },
+    senderId: { type: Schema.Types.ObjectId},
+    receiverId: { type: Schema.Types.ObjectId},
     content: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
     readReceipt: { type: Boolean, default: false }
@@ -51,4 +52,6 @@ const chatSchema = new Schema({
     messages: [messageSchema]
 });
 
-export default mongoose.model<IChat>('Chat', chatSchema);
+const Chat = mongoose.model<IChat>('Chat', chatSchema);
+
+export default Chat;
