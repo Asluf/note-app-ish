@@ -13,7 +13,7 @@ const getChats = async (req: Request, res: Response) => {
             .lean();
 
         chats.forEach(chat => {
-            chat.messages = chat.messages.slice(-10);
+            chat.messages = chat.messages.slice(-20);
         });
 
         res.send({ success: true, chats });

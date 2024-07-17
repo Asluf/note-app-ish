@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AuthService } from "../services/authService";
-import { NoteContext } from "../contexts/NoteContext";
+import { AuthService } from "../../services/authService";
+import { NoteContext } from "../../contexts/NoteContext";
 import Swal from "sweetalert2";
 import Navbar from "./NavBar";
-import { useTokenContext } from "../contexts/TokenContext";
+import { useTokenContext } from "../../contexts/TokenContext";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");

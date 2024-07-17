@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
-import { NoteContext } from '../contexts/NoteContext';
+import { NoteContext } from '../../contexts/NoteContext';
 import NoteCard from './NoteCard';
-import { Note } from '../models/note';
+import { Note } from '../../models/note';
 interface NoteListProps {
   token: string | undefined;
 }

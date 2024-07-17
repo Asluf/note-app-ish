@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AuthService } from '../services/authService';
+import { AuthService } from '../../services/authService';
 import Swal from 'sweetalert2';
 import Navbar from './NavBar';
-import { useTokenContext } from '../contexts/TokenContext';
+import { useTokenContext } from '../../contexts/TokenContext';
 
 const Signup: React.FC = () => {
 

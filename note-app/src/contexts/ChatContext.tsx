@@ -12,8 +12,17 @@ interface ChatContextType {
   isChatPopupVisible: boolean;
   setIChatPopupVisible: Dispatch<SetStateAction<boolean>>;
 }
+const defaultChatContext: ChatContextType = {
+  chats: [],
+  setChats: () => { },
+  fetchChats: () => { },
+  currentChat: undefined,
+  setCurrentChat: () => { },
+  isChatPopupVisible: false,
+  setIChatPopupVisible: () => { }
+};
 
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
+const ChatContext = createContext<ChatContextType>(defaultChatContext);
 
 const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -34,7 +43,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  
+
   return (
     <ChatContext.Provider
       value={{

@@ -75,9 +75,9 @@ io.on('connection', (socket) => {
   socket.on('send_message', async (data: IMessage) => {
     try {
       const user = await UserSocket.findOne({ userId: data.receiverId });
-      if (user && user.socketId) {
-        io.to(user.socketId).emit('receive_message', data);
-      }
+      // if (user && user.socketId) {
+      //   io.to(user.socketId).emit('receive_message', data);
+      // }
       // storing in the db
       let chat = await Chat.findOne({
         $or: [
@@ -89,15 +89,22 @@ io.on('connection', (socket) => {
       if (chat) {
         chat.timestamp = new Date();
         chat.messages.push(data);
-        await chat.save();
       } else {
         chat = new Chat({
           user1: data.senderId,
           user2: data.receiverId,
           messages: [data]
         });
-        await chat.save();
       }
+
+      const newChat = await chat.save();
+
+      const newMessage = newChat.messages[newChat.messages.length - 1];
+
+      if (user && user.socketId) {
+        io.to(user.socketId).emit('receive_message', {newMessage, chatId:newChat._id});
+      }
+
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -111,12 +118,12 @@ server.listen(PORT, () => {
 
 
 /*
-implement chat recipient list Ui
-implement chat inside ui
+DONE implement chat recipient list Ui
+DONE  implement chat inside ui
 
-implement context for store chat recipient with latest msg
-implement context for store all the messages inside previous context when going inside the chat  -> future implement fetch last 20 msgs only and fetch if scroll to old
+DONE implement context for store chat recipient with latest msg
+DONE implement context for store all the messages inside previous context when going inside the chat  -> future implement fetch last 20 msgs only and fetch if scroll to old
 
-when sending msg need to store locally also. merge with previous.
+DONE when sending msg need to store locally also. merge with previous.
 implement receive msg socket listener to merge the new msg.
 */

@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Swal from 'sweetalert2';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTokenContext } from '../contexts/TokenContext';
-import { ChatContext } from '../contexts/ChatContext';
+import { useTokenContext } from '../../contexts/TokenContext';
 interface NavbarProps {
   path: string;
   onChatButtonClick?: () => void;
