@@ -37,8 +37,6 @@ mongoose
   .then(() => console.log("Connected to Database"))
   .catch((error) => console.error("Database connection error:", error));
 
-
-
 app.use("/api", noteRoutes);
 app.use("/auth", authRoutes);
 app.use("/chat", chatRoutes);
@@ -87,6 +85,6 @@ io.on('connection', (socket) => {
   });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -8,7 +8,7 @@ import { NoteContext } from '../contexts/NoteContext';
 import ChatPopup from './ChatPopup';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:8080');
+
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
@@ -30,7 +30,9 @@ const Dashboard: React.FC = () => {
       fetchProject(token)
     }
   }, []);
+  
   useEffect(() => {
+    const socket = io('http://localhost:8080');
     console.log({ userId });
 
     socket.on('connect', () => {
