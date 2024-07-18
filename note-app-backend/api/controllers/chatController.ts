@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import Chat from '../models/chatModel';
+import User from '../models/userModel';
+import mongoose, { Types } from 'mongoose';
 
-const getChats = async (req: Request, res: Response) => {
+export const getChats = async (req: Request, res: Response) => {
     try {
         const userId = req.params.userId;
 
@@ -21,17 +23,35 @@ const getChats = async (req: Request, res: Response) => {
         res.send({ success: false, message: 'Failed to fetch chats' });
     }
 };
-
-// Send 
-const sendChat = async (req: Request, res: Response) => {
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { sender, receiver, message } = req.body;
-        const newChat = new Chat({ sender, receiver, message });
-        await newChat.save();
-        res.send({ sucess: true, message: 'Chat sent successfully', chat: newChat });
+        const users = await User.find({}, '_id email username');
+        res.send({ success: true, users });
     } catch (error) {
-        res.send({ sucess: false, message: 'Failed to send chat' });
+        res.send({ success: false, message: "Failed to fetch users" });
     }
 };
 
-export { getChats, sendChat };
+export const createChat = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const chat = new Chat({
+            user1: new mongoose.Types.ObjectId(req.body.user1),
+            user2: new mongoose.Types.ObjectId(req.body.user2),
+            messages: []
+        });
+
+        await chat.save();
+        const savedChat = await Chat.findById(chat._id)
+            .populate('user1', 'username')
+            .populate('user2', 'username');
+
+        if (!savedChat) {
+            throw new Error("Chat not found");
+        }
+
+        res.send({ success: true, chat: savedChat });
+    } catch (error) {
+        console.error(error);
+        res.send({ success: false, message: "Failed to create chat" });
+    }
+};

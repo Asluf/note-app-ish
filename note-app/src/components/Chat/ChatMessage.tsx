@@ -20,7 +20,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
   if (!chatContext) {
     throw new Error('Chat must be used within a NoteProvider');
   }
-  const { chats, setChats, currentChat, setIChatPopupVisible } = chatContext;
+  const { chats, setChats, currentChat, setIsChatPopupVisible } = chatContext;
 
   useEffect(() => {
     const chat = chats.find((chat: Chat) => chat._id === currentChat?._id);
@@ -51,6 +51,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
             return {
               ...chat,
               messages: [...(chat.messages || []), msg],
+              timestamp: new Date(),
             };
           }
           return chat;
@@ -62,8 +63,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
   return (
     <div className="absolute right-0 top-[60px] h-[600px] w-[300px] bg-brown-200 shadow-lg p-4 z-50 rounded-lg flex flex-col text-brown-900">
       <h2 className="text-lg font-bold mb-2">
-        <button onClick={()=> setIChatPopupVisible(false)}><FontAwesomeIcon
-          icon={faArrowLeft }
+        <button onClick={() => setIsChatPopupVisible(false)}><FontAwesomeIcon
+          icon={faArrowLeft}
           className="text-[16px] mr-3"
         /></button>
         {filteredChat?.user1._id == userId ? filteredChat?.user2.username : filteredChat?.user1.username}</h2>

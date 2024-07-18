@@ -1,31 +1,35 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080'; 
+const BASE_URL = 'http://localhost:8080';
 
 export class ChatService {
     private static API_URL = `${BASE_URL}/chat`;
 
-    public static async fetchChats(userId: string): Promise<any> {
+    public static async fetchChats(userId: string, token: string): Promise<any> {
         try {
-            const response = await axios.get(`${this.API_URL}/${userId}`);
+            const response = await axios.get(`${this.API_URL}/getChats/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             return response.data;
         } catch (error) {
             throw new Error('Failed to fetch chats');
         }
     }
 
-    public static async sendChatMessage(sender: string, receiver: string, message: string): Promise<any> {
+    public static async fetchUsers(token: string): Promise<any> {
         try {
-            const data = { sender, receiver, message };
-            const response = await axios.post(`${this.API_URL}/send`, data, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true, 
+            const response = await axios.get(`${this.API_URL}/getUsers`, {
+                headers: { Authorization: `Bearer ${token}` },
             });
             return response.data;
         } catch (error) {
-            throw new Error('Failed to send chat');
+            throw new Error('Failed to fetch chats');
         }
     }
+    public static async createChat(data: any, token: string): Promise<any> {
+        return await axios.post(`${this.API_URL}/createChat`, data, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+    }
+
 }

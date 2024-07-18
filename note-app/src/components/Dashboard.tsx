@@ -32,7 +32,7 @@ const Dashboard: React.FC = () => {
     throw new Error('Chat must be used within a NoteProvider');
   }
 
-  const { setIChatPopupVisible, setChats } = chatContext;
+  const { setIsChatPopupVisible, setChats, setIsNewChatVisible } = chatContext;
   useEffect(() => {
     if (!token || token === '') {
       navigate('/login');
@@ -60,6 +60,7 @@ const Dashboard: React.FC = () => {
             return {
               ...chat,
               messages: [...(chat.messages || []), data.newMessage],
+              timestamp:data.newMessage.timestamp
             };
           }
           return chat;
@@ -80,14 +81,15 @@ const Dashboard: React.FC = () => {
 
   const toggleChatPopup = () => {
     setIsChatOpen((prev) => !prev);
-    setIChatPopupVisible(false);
+    setIsChatPopupVisible(false);
+    setIsNewChatVisible(false);
   };
 
 
   return (
     <div className="w-[100%] h-[100vh]">
       <Navbar path={location.pathname} onChatButtonClick={toggleChatPopup} />
-      {isChatOpen && <ChatList userId={userId ?? ''} sendMessage={sendMessage} />}
+      {isChatOpen && <ChatList userId={userId ?? ''} sendMessage={sendMessage} token={token}/>}
       <div className="w-[100%] flex justify-center items-center">
         <div className="mt-5 bg-brown-300 bg-opacity-50 w-[450px] h-[100px] rounded-xl px-10 py-5 shadow-xl flex flex-col gap-4 ">
           <NoteForm token={token} />
