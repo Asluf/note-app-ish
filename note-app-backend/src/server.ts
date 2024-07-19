@@ -97,12 +97,15 @@ io.on('connection', (socket) => {
         });
       }
 
-      const newChat = await chat.save();
+      const savedChat = await chat.save();
+      const newChat = await Chat.findById(savedChat._id)
+        .populate('user1', 'username')
+        .populate('user2', 'username');
 
-      const newMessage = newChat.messages[newChat.messages.length - 1];
+      const newMessage = newChat?.messages[newChat.messages.length - 1];
 
       if (user && user.socketId) {
-        io.to(user.socketId).emit('receive_message', {newMessage, chatId:newChat._id});
+        io.to(user.socketId).emit('receive_message', { newMessage, newChat });
       }
 
     } catch (error) {

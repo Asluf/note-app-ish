@@ -25,6 +25,8 @@ const NewChat: React.FC<NewChatProps> = ({ userId, token }) => {
         const chatAlreadyExist = chats.find((chat: Chat) => chat.user1._id == user._id || chat.user2._id == user._id);
         if (chatAlreadyExist) {
             setCurrentChat(chatAlreadyExist);
+            setIsNewChatVisible(false);
+            setIsChatPopupVisible(true);
         } else {
             const data = {
                 user1: userId,
@@ -33,8 +35,7 @@ const NewChat: React.FC<NewChatProps> = ({ userId, token }) => {
             createChat(data, token ?? '')
         }
 
-        setIsNewChatVisible(false);
-        setIsChatPopupVisible(true);
+
     }
     return (
         <div className="absolute right-0 top-[60px] h-[600px] w-[300px] bg-brown-200 shadow-lg p-4 z-50 rounded-lg flex flex-col text-brown-900">

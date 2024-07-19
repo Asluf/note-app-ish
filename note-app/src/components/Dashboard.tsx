@@ -12,27 +12,26 @@ import { ChatContext } from '../contexts/ChatContext';
 import alert from '../assets/alert.wav';
 
 const Dashboard: React.FC = () => {
+  const notificationSound = new Audio(alert);
+  const chatPopupRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { token, userId } = useTokenContext();
   const [isChatOpen, setIsChatOpen] = useState(false);
+
   const noteContext = useContext(NoteContext);
-  const notificationSound = new Audio(alert);
-
-
   if (!noteContext) {
     throw new Error('NoteForm must be used within a NoteProvider');
   }
-
   const { fetchProject } = noteContext;
-  const chatContext = useContext(ChatContext);
 
+  const chatContext = useContext(ChatContext);
   if (!chatContext) {
     throw new Error('Chat must be used within a NoteProvider');
   }
-
   const { setIsChatPopupVisible, setChats, setIsNewChatVisible } = chatContext;
+
   useEffect(() => {
     if (!token || token === '') {
       navigate('/login');
@@ -54,17 +53,23 @@ const Dashboard: React.FC = () => {
       console.log('Message received:', data);
       notificationSound.play();
 
-      setChats(prevChats => {
-        return prevChats.map(chat => {
-          if (chat._id === data.chatId) {
-            return {
-              ...chat,
-              messages: [...(chat.messages || []), data.newMessage],
-              timestamp:data.newMessage.timestamp
-            };
-          }
-          return chat;
-        });
+      setChats((prevChats) => {
+        const chatExists = prevChats.some((chat) => chat._id === data.newChat._id);
+
+        if (chatExists) {
+          return prevChats.map((chat) => {
+            if (chat._id === data.newChat._id) {
+              return {
+                ...chat,
+                messages: [...(chat.messages || []), data.newMessage],
+                timestamp: data.newMessage.timestamp,
+              };
+            }
+            return chat;
+          });
+        } else {
+          return [...prevChats, { ...data.newChat, messages: [data.newMessage] }];
+        }
       });
     });
 
@@ -72,6 +77,23 @@ const Dashboard: React.FC = () => {
       socket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (isChatOpen) {
+      document.addEventListener('mousedown', handleClickOutsideChat);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutsideChat);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideChat);
+    };
+  }, [isChatOpen]);
+
+  const handleClickOutsideChat = (event: MouseEvent) => {
+    if (chatPopupRef.current && !chatPopupRef.current.contains(event.target as Node)) {
+      setIsChatOpen(false);
+    }
+  };
 
   const sendMessage = (message: Message) => {
     if (socketRef.current) {
@@ -89,7 +111,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="w-[100%] h-[100vh]">
       <Navbar path={location.pathname} onChatButtonClick={toggleChatPopup} />
-      {isChatOpen && <ChatList userId={userId ?? ''} sendMessage={sendMessage} token={token}/>}
+      {isChatOpen && <div ref={chatPopupRef}><ChatList userId={userId ?? ''} sendMessage={sendMessage} token={token} /></div>}
       <div className="w-[100%] flex justify-center items-center">
         <div className="mt-5 bg-brown-300 bg-opacity-50 w-[450px] h-[100px] rounded-xl px-10 py-5 shadow-xl flex flex-col gap-4 ">
           <NoteForm token={token} />

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useState } from "react";
 import { ChatContext } from "../../contexts/ChatContext";
 import { Chat } from "../../models/chat";
 import { Message } from "../../models/message";

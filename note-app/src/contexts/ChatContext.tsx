@@ -77,6 +77,8 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       if (response.data.success) {
         setCurrentChat(response.data.chat as Chat);
         setChats(prevChats => [...prevChats, response.data.chat]);
+        setIsNewChatVisible(false);
+        setIsChatPopupVisible(true);
       } else {
         throw new Error("Failed to fetch chats");
       }

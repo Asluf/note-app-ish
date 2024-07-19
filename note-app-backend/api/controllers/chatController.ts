@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Chat from '../models/chatModel';
 import User from '../models/userModel';
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
 
 export const getChats = async (req: Request, res: Response) => {
     try {
