@@ -1,8 +1,8 @@
 import { createContext, useState, ReactNode, SetStateAction, Dispatch } from "react";
-import Swal from "sweetalert2";
 import { Chat } from "../models/chat";
 import { ChatService } from "../services/chatService";
 import { User } from "../models/user";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 interface ChatContextType {
   chats: Chat[];
@@ -11,13 +11,15 @@ interface ChatContextType {
   setUsers: Dispatch<SetStateAction<User[]>>;
   fetchChats: (userId: string, token: string) => void;
   fetchUsers: (token: string) => void;
-  createChat: (data:any,token: string) => void;
+  createChat: (data: any, token: string) => void;
   currentChat: Chat | undefined;
   setCurrentChat: (chat: Chat | undefined) => void;
   isChatPopupVisible: boolean;
   setIsChatPopupVisible: Dispatch<SetStateAction<boolean>>;
   isNewChatVisible: boolean;
   setIsNewChatVisible: Dispatch<SetStateAction<boolean>>;
+  showSuccessToast: (body: string) => void;
+  showErrorToast: (body: string) => void;
 }
 const defaultChatContext: ChatContextType = {
   chats: [],
@@ -32,7 +34,9 @@ const defaultChatContext: ChatContextType = {
   isChatPopupVisible: false,
   setIsChatPopupVisible: () => { },
   isNewChatVisible: false,
-  setIsNewChatVisible: () => { }
+  setIsNewChatVisible: () => { },
+  showSuccessToast: () => { },
+  showErrorToast: () => { }
 };
 
 const ChatContext = createContext<ChatContextType>(defaultChatContext);
@@ -44,6 +48,33 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [isNewChatVisible, setIsNewChatVisible] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
 
+  const showSuccessToast = (body: string) => {
+    toast.success(body, {
+      position: "bottom-right",
+      autoClose: 1500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  };
+  const showErrorToast = (body: string) => {
+    toast.error(body, {
+      position: "bottom-right",
+      autoClose: 1500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  };
+
   const fetchChats = async (userId: string, token: string) => {
     try {
       const response = await ChatService.fetchChats(userId, token);
@@ -54,7 +85,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.log(error);
-      Swal.fire("Error", "Failed to fetch chats", "error");
+      showErrorToast('Failed to fetch chats!');
     }
   };
 
@@ -68,7 +99,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.log(error);
-      Swal.fire("Error", "Failed to fetch users", "error");
+      showErrorToast('Failed to fetch users!');
     }
   };
   const createChat = async (data: any, token: string) => {
@@ -84,7 +115,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.log(error);
-      Swal.fire("Error", "Failed to create chat", "error");
+      showErrorToast('Failed to create chat!');
     }
   };
 
@@ -104,10 +135,13 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
         isChatPopupVisible,
         setIsChatPopupVisible,
         isNewChatVisible,
-        setIsNewChatVisible
+        setIsNewChatVisible,
+        showSuccessToast,
+        showErrorToast
       }}
     >
       {children}
+      <ToastContainer />
     </ChatContext.Provider>
   );
 };

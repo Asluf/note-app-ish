@@ -8,6 +8,8 @@ import Home from "./components/common/Home";
 import Dashboard from "./components/Dashboard"
 import { TokenProvider } from "./contexts/TokenContext";
 import { ChatProvider } from "./contexts/ChatContext";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const App: React.FC = () => {
   return (

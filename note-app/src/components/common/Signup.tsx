@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthService } from '../../services/authService';
-import Swal from 'sweetalert2';
 import Navbar from './NavBar';
 import { useTokenContext } from '../../contexts/TokenContext';
+import { ChatContext } from '../../contexts/ChatContext';
 
 const Signup: React.FC = () => {
 
@@ -13,7 +13,12 @@ const Signup: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
-  const {token, setToken,setUserId} = useTokenContext();
+  const { token, setToken, setUserId } = useTokenContext();
+  const chatContext = useContext(ChatContext);
+  if (!chatContext) {
+    throw new Error("NoteList must be used within a NoteProvider");
+  }
+  const { showErrorToast, showSuccessToast } = chatContext;
 
   useEffect(() => {
     if (token || token !== '') {
@@ -27,45 +32,29 @@ const Signup: React.FC = () => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Passwords do not match.",
-        showConfirmButton: false,
-        timer: 1500
-      });
+      showErrorToast('Passwords do not match!')
       return;
     }
     try {
       const response = await AuthService.signup(email, password, userName);
-      if (response.data.success){
-        Swal.fire({
-          icon: 'success',
-          title: 'Signup Successful!',
-          text: 'You have successfully signed up.',
-        }).then((result) => {
-          if (result.isConfirmed || result.isDismissed) {
-            window.location.href = '/login'; 
-          }
-        });
-      }  
+      if (response.data.success) {
+        showSuccessToast('You have successfully signed-up');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+
+      }
     } catch (error) {
       console.error('Signup error:', error);
       setError('Signup failed. Please try again.');
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Signup failed. Please try again.",
-        showConfirmButton: false,
-        timer: 1500
-      });
+      showErrorToast('Sign-up failed. Please try again.');
     }
   };
 
   return (
     <div className="w-[100%] h-[100vh]">
       {/* Navbar */}
-      <Navbar path={location.pathname}/>
+      <Navbar path={location.pathname} />
       <div className="w-[100%] h-[92vh] flex justify-center items-center">
         <div className="bg-brown-300 bg-opacity-50 w-[450px] h-[400px] rounded-xl px-10 py-5 shadow-xl flex flex-col gap-4 ">
           <h2 className="font-bold text-2xl flex justify-center items-center">Sign-up</h2>

@@ -4,5 +4,5 @@ export interface Message {
     receiverId: string;
     content: string;
     timestamp?: Date;
-    readReceipt?: boolean;
+    readReceipt: boolean;
 }

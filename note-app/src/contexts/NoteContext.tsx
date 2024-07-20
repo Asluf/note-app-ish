@@ -1,7 +1,7 @@
-import { createContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useState, ReactNode, useContext } from "react";
 import { NoteService } from "../services/noteService";
 import { Note } from "../models/note";
-import Swal from "sweetalert2";
+import { ChatContext } from "./ChatContext";
 
 interface NoteContextType {
   notes: Note[];
@@ -24,6 +24,12 @@ const NoteProvider = ({ children }: { children: ReactNode }) => {
   const [currentContent, setCurrentContent] = useState<string | undefined>("");
   const [currentId, setCurrentId] = useState<string>("");
 
+  const chatContext = useContext(ChatContext);
+  if (!chatContext) {
+    throw new Error("NoteList must be used within a NoteProvider");
+  }
+  const { showErrorToast, showSuccessToast } = chatContext;
+
   //useEffect(() => {
   // fetchProject();
   //}, []);
@@ -38,7 +44,7 @@ const NoteProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("Failed to fetch notes");
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to fetch notes", "error");
+      showErrorToast('Failed to fetch notes!');
     }
   };
 
@@ -52,7 +58,7 @@ const NoteProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("Failed to fetch notes");
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to fetch notes", "error");
+      showErrorToast('Failed to fetch notes!');
     }
   };
 
@@ -62,18 +68,12 @@ const NoteProvider = ({ children }: { children: ReactNode }) => {
       if (response.data.success) {
         setNotes([...notes, response.data.note]);
         setCurrentContent("");
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Note added successfully",
-          showConfirmButton: false,
-          timer: 1500
-        });
+        showSuccessToast('Note added successfully');
       } else {
         throw new Error("Failed to add note");
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to add note", "error");
+      showErrorToast('Failed to add note!')
     }
   };
 
@@ -83,18 +83,12 @@ const NoteProvider = ({ children }: { children: ReactNode }) => {
       if (response.data.success) {
         const updatedNotes = notes.filter((note: Note) => note._id !== _id);
         setNotes(updatedNotes);
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Note deleted successfully",
-          showConfirmButton: false,
-          timer: 1500
-        });
+        showSuccessToast('Note deleted successfully.')
       } else {
         throw new Error("Failed to delete note");
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to delete note", "error");
+      showErrorToast('Failed to delete note!')
     }
   };
 
@@ -119,18 +113,12 @@ const NoteProvider = ({ children }: { children: ReactNode }) => {
         setEditing(false);
         setCurrentContent("");
         setCurrentId("");
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Note updated successfully",
-          showConfirmButton: false,
-          timer: 1500
-        });
+        showSuccessToast('Note updated successfully')
       } else {
         throw new Error("Failed to update note");
       }
     } catch (error) {
-      Swal.fire("Error", "Failed to update note", "error");
+      showErrorToast('Failed to update note!')
     }
   };
 
