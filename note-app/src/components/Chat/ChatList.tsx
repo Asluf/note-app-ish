@@ -31,6 +31,7 @@ const ChatList: React.FC<ChatListProps> = ({ userId, sendMessage, token }) => {
       fetchChats(userId, token ?? '');
     }
   }, []);
+
   useEffect(() => {
     const sortedChats = chats
       .map(chat => ({
@@ -56,6 +57,18 @@ const ChatList: React.FC<ChatListProps> = ({ userId, sendMessage, token }) => {
   const handleClickChat = (chat: Chat) => {
     setCurrentChat(chat);
     setIsChatPopupVisible(true);
+  }
+  const renderUnreadCount = (messages: Message[] | undefined): JSX.Element => {
+    if (messages) {
+      const unreadMessages = messages.filter(message => message.receiverId.toString() === userId && !message.readReceipt);
+      if (unreadMessages.length > 0) {
+        return <span className="w-[20px] h-[20px] bg-brown-900 text-white rounded-full flex items-center justify-center text-[10px]">
+          {unreadMessages.length > 9 ? '9+' : unreadMessages.length}
+        </span>;
+      }
+      return <span></span>;
+    }
+    return <span></span>;
   }
   const renderTimeStamp = (timestamp: Date | null) => {
     if (!timestamp) {
@@ -102,8 +115,11 @@ const ChatList: React.FC<ChatListProps> = ({ userId, sendMessage, token }) => {
                   className="cursor-pointer py-2 border-b-2 text-sm font-normal flex flex-col"
                   onClick={() => handleClickChat(chat)}
                 >
-                  <span className="text-[13px] font-semibold">
-                    {chat.user1._id === userId ? chat.user2.username : chat.user1.username}
+                  <span className="flex justify-between">
+                    <span className="text-[13px] font-semibold">
+                      {chat.user1._id === userId ? chat.user2.username : chat.user1.username}
+                    </span>
+                    <span>{renderUnreadCount(chat.messages)}</span>
                   </span>
                   <span className="flex justify-between">
                     <span className="text-[12px]">{renderLastMessage(chat.messages)}</span>

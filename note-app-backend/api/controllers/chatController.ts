@@ -15,7 +15,10 @@ export const getChats = async (req: Request, res: Response) => {
             .lean();
 
         chats.forEach(chat => {
-            chat.messages = chat.messages.slice(-20);
+            const unreadMessages = chat.messages.filter(message => message.receiverId.toString() === userId && !message.readReceipt);
+            let messageCount = unreadMessages.length + 20;
+            console.log(messageCount);
+            chat.messages = chat.messages.slice(-messageCount);
         });
 
         res.send({ success: true, chats });

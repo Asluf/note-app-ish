@@ -5,6 +5,8 @@ import { Chat } from "../../models/chat";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons/faPaperPlane";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons/faArrowLeft";
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
+import { faCheckDouble } from "@fortawesome/free-solid-svg-icons/faCheckDouble";
 
 interface ChatMessageProps {
   userId: string;
@@ -29,11 +31,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
+    // need to implement logic for readReceipt
+    console.log('read receipt ')
   }, [chats]);
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
+    console.log('object')
   }, [filteredChat]);
 
   const handleSendMessage = () => {
@@ -42,6 +47,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
         senderId: userId,
         receiverId: filteredChat?.user1._id == userId ? filteredChat?.user2._id : filteredChat?.user1._id ?? '',
         content: content,
+        readReceipt: false
       }
       sendMessage(msg);
       setContent('');
@@ -67,17 +73,21 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
           icon={faArrowLeft}
           className="text-[16px] mr-3"
         /></button>
-        {filteredChat?.user1._id == userId ? filteredChat?.user2.username : filteredChat?.user1.username}</h2>
+        {filteredChat?.user1._id == userId ? filteredChat?.user2.username : filteredChat?.user1.username}
+      </h2>
       <span className="w-[100%] bg-brown-500 h-[1px]"></span>
       <div className="flex-grow overflow-y-scroll mb-4 mt-2 hide-scrollbar" ref={chatContainerRef}>
         {filteredChat?.messages?.map((msg: Message, index: number) => (
           msg.senderId === userId ? (
             <div key={index} className="flex justify-end mb-2 ">
-              <span className="bg-brown-100 rounded-bl-lg px-2"> {msg.content} </span>
+              <span className="relative bg-brown-100 rounded-bl-lg px-2 max-w-[250px] flex-wrap">
+                <span className="mr-2">{msg.content}</span>
+                <FontAwesomeIcon icon={msg.readReceipt ? faCheckDouble : faCheck} className="absolute bottom-0 right-0 mb-1 mr-1 text-[10px]" />
+              </span>
             </div>
           ) : (
             <div key={index} className="flex justify-start mb-2">
-              <span className="bg-brown-100 shadow-xl rounded-br-lg px-2"> {msg.content} </span>
+              <span className="bg-brown-100 shadow-xl rounded-br-lg px-2 max-w-[250px] flex-wrap"> {msg.content} </span>
             </div>
           )
         )) || null}
