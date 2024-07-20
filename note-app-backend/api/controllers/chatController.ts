@@ -17,7 +17,6 @@ export const getChats = async (req: Request, res: Response) => {
         chats.forEach(chat => {
             const unreadMessages = chat.messages.filter(message => message.receiverId.toString() === userId && !message.readReceipt);
             let messageCount = unreadMessages.length + 20;
-            console.log(messageCount);
             chat.messages = chat.messages.slice(-messageCount);
         });
 
