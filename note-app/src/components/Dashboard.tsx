@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
     });
 
     socket.on('receive_message', (data) => {
-      console.log('Message received:', data);
+      // console.log('Message received:', data);
       notificationSound.play();
 
       setChats((prevChats) => {
@@ -70,6 +70,30 @@ const Dashboard: React.FC = () => {
         } else {
           return [...prevChats, { ...data.newChat, messages: [data.newMessage] }];
         }
+      });
+    });
+
+    socket.on('receive_marked_as_read', (data:{chatId:string,receiverId:string}) => {
+      // console.log('Message received:', data);
+
+      setChats(prevChats => {
+        return prevChats.map(chat => {
+          if (chat._id === data.chatId) {
+            return {
+              ...chat,
+              messages: chat.messages?.map(message => {
+                if (message.receiverId === data.receiverId && !message.readReceipt) {
+                  return {
+                    ...message,
+                    readReceipt: true
+                  };
+                }
+                return message;
+              })
+            };
+          }
+          return chat;
+        });
       });
     });
 
@@ -101,6 +125,16 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const markAsread = (chatId:string, receiverId: string) => {
+    const data = {
+      chatId:chatId,
+      receiverId:receiverId
+    }
+    if (socketRef.current) {
+      socketRef.current.emit('mark_as_read', data);
+    }
+  };
+
   const toggleChatPopup = () => {
     setIsChatOpen((prev) => !prev);
     setIsChatPopupVisible(false);
@@ -111,7 +145,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="w-[100%] h-[100vh]">
       <Navbar path={location.pathname} onChatButtonClick={toggleChatPopup} />
-      {isChatOpen && <div ref={chatPopupRef}><ChatList userId={userId ?? ''} sendMessage={sendMessage} token={token} /></div>}
+      {isChatOpen && <div ref={chatPopupRef}><ChatList userId={userId ?? ''} token={token} sendMessage={sendMessage} markAsRead={markAsread}/></div>}
       <div className="w-[100%] flex justify-center items-center">
         <div className="mt-5 bg-brown-300 bg-opacity-50 w-[450px] h-[100px] rounded-xl px-10 py-5 shadow-xl flex flex-col gap-4 ">
           <NoteForm token={token} />

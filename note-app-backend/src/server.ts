@@ -1,5 +1,5 @@
 import express from "express";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -75,10 +75,6 @@ io.on('connection', (socket) => {
   socket.on('send_message', async (data: IMessage) => {
     try {
       const user = await UserSocket.findOne({ userId: data.receiverId });
-      // if (user && user.socketId) {
-      //   io.to(user.socketId).emit('receive_message', data);
-      // }
-      // storing in the db
       let chat = await Chat.findOne({
         $or: [
           { user1: data.senderId, user2: data.receiverId },
@@ -110,6 +106,34 @@ io.on('connection', (socket) => {
 
     } catch (error) {
       console.error('Error sending message:', error);
+    }
+  });
+
+  socket.on('mark_as_read', async (data: { chatId: string, receiverId: string }) => {
+    try {
+      const selectedChat = await Chat.findById(data.chatId);
+      if (!selectedChat) {
+        throw new Error('Chat not found');
+      }
+
+      selectedChat.messages = selectedChat.messages.map(message => {
+        if (message.receiverId.toString() === data.receiverId && !message.readReceipt) {
+          message.readReceipt = true;
+        }
+        return message;
+      });
+      await selectedChat.save();
+
+      const senderId = selectedChat.user1.toString() === data.receiverId ? selectedChat.user2 : selectedChat.user1;
+      const user = await UserSocket.findOne({userId:senderId});
+
+    
+      if (user && user.socketId) {
+        io.to(user.socketId).emit('receive_marked_as_read', data);
+      }
+
+    } catch (error) {
+      console.error('Error in updating read receipt:', error);
     }
   });
 });

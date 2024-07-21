@@ -11,9 +11,10 @@ import { faCheckDouble } from "@fortawesome/free-solid-svg-icons/faCheckDouble";
 interface ChatMessageProps {
   userId: string;
   sendMessage: (message: Message) => void;
+  markAsRead: (chatId: string, receiverId: string) => void;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage, markAsRead }) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState("");
   const [filteredChat, setFilteredChat] = useState<Chat | undefined>(undefined);
@@ -31,14 +32,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-    // need to implement logic for readReceipt
-    console.log('read receipt ')
+    // read receipt
+    const unreadMessageCount = chat?.messages?.filter(message => message.receiverId.toString() === userId && !message.readReceipt).length;
+    if (chat && chat._id && unreadMessageCount && unreadMessageCount > 0) {
+      handleReadReceipt(chat._id);
+    }
   }, [chats]);
+
+  // scroll bar to the down
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-    console.log('object')
   }, [filteredChat]);
 
   const handleSendMessage = () => {
@@ -65,6 +70,32 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ userId, sendMessage }) => {
       });
     }
   };
+
+  const handleReadReceipt = (chatId: string) => {
+    markAsRead(chatId, userId);
+
+    setChats(prevChats => {
+      return prevChats.map(chat => {
+        if (chat._id === chatId) {
+          return {
+            ...chat,
+            messages: chat.messages?.map(message => {
+              if (message.receiverId === userId && !message.readReceipt) {
+                return {
+                  ...message,
+                  readReceipt: true
+                };
+              }
+              return message;
+            })
+          };
+        }
+        return chat;
+      });
+    });
+  };
+
+
 
   return (
     <div className="absolute right-0 top-[60px] h-[600px] w-[300px] bg-brown-200 shadow-lg p-4 z-50 rounded-lg flex flex-col text-brown-900">

@@ -12,10 +12,11 @@ import { format, isToday, isYesterday } from 'date-fns';
 
 interface ChatListProps {
   userId: string;
-  sendMessage: (message: Message) => void;
   token: string | undefined;
+  sendMessage: (message: Message) => void;
+  markAsRead: (chatId:string, receiverId: string) => void;
 }
-const ChatList: React.FC<ChatListProps> = ({ userId, sendMessage, token }) => {
+const ChatList: React.FC<ChatListProps> = ({ userId, token, sendMessage, markAsRead }) => {
   const [sortedChats, setSortedChats] = useState<Chat[]>([]);
 
   const chatContext = useContext(ChatContext);
@@ -88,7 +89,7 @@ const ChatList: React.FC<ChatListProps> = ({ userId, sendMessage, token }) => {
   return (
     <>
       {isChatPopupVisible &&
-        <ChatMessage userId={userId} sendMessage={sendMessage} />
+        <ChatMessage userId={userId} sendMessage={sendMessage} markAsRead={markAsRead} />
       }
       {isNewChatVisible &&
         <NewChat userId={userId} token={token} />
