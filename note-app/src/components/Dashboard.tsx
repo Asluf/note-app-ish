@@ -50,15 +50,15 @@ const Dashboard: React.FC = () => {
     });
 
     socket.on('receive_message', (data) => {
-      // console.log('Message received:', data);
+      console.log('Message received:', data);
       notificationSound.play();
 
       setChats((prevChats) => {
-        const chatExists = prevChats.some((chat) => chat._id === data.newChat._id);
+        const chatExists = prevChats.some((chat) => chat._id === data.newChatWithoutMessages._id);
 
         if (chatExists) {
           return prevChats.map((chat) => {
-            if (chat._id === data.newChat._id) {
+            if (chat._id === data.newChatWithoutMessages._id) {
               return {
                 ...chat,
                 messages: [...(chat.messages || []), data.newMessage],
@@ -68,7 +68,7 @@ const Dashboard: React.FC = () => {
             return chat;
           });
         } else {
-          return [...prevChats, { ...data.newChat, messages: [data.newMessage] }];
+          return [...prevChats, { ...data.newChatWithoutMessages, messages: [data.newMessage] }];
         }
       });
     });

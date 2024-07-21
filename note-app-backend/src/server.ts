@@ -74,7 +74,6 @@ io.on('connection', (socket) => {
 
   socket.on('send_message', async (data: IMessage) => {
     try {
-      const user = await UserSocket.findOne({ userId: data.receiverId });
       let chat = await Chat.findOne({
         $or: [
           { user1: data.senderId, user2: data.receiverId },
@@ -100,8 +99,19 @@ io.on('connection', (socket) => {
 
       const newMessage = newChat?.messages[newChat.messages.length - 1];
 
+      const newChatWithoutMessages = {
+        _id: newChat?._id,
+        user1: newChat?.user1,
+        user2: newChat?.user2,
+        timestamp: newChat?.timestamp,
+        is_deleted1: newChat?.is_deleted1,
+        is_deleted2: newChat?.is_deleted2,
+        messages: []
+      }
+
+      const user = await UserSocket.findOne({ userId: data.receiverId });
       if (user && user.socketId) {
-        io.to(user.socketId).emit('receive_message', { newMessage, newChat });
+        io.to(user.socketId).emit('receive_message', { newMessage, newChatWithoutMessages });
       }
 
     } catch (error) {
@@ -125,9 +135,9 @@ io.on('connection', (socket) => {
       await selectedChat.save();
 
       const senderId = selectedChat.user1.toString() === data.receiverId ? selectedChat.user2 : selectedChat.user1;
-      const user = await UserSocket.findOne({userId:senderId});
+      const user = await UserSocket.findOne({ userId: senderId });
 
-    
+
       if (user && user.socketId) {
         io.to(user.socketId).emit('receive_marked_as_read', data);
       }
