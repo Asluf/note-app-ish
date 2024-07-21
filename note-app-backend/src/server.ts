@@ -1,5 +1,5 @@
 import express from "express";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -141,16 +141,3 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
-
-
-/*
-DONE implement chat recipient list Ui
-DONE  implement chat inside ui
-
-DONE implement context for store chat recipient with latest msg
-DONE implement context for store all the messages inside previous context when going inside the chat  -> future implement fetch last 20 msgs only and fetch if scroll to old
-
-DONE when sending msg need to store locally also. merge with previous.
-implement receive msg socket listener to merge the new msg.
-*/
