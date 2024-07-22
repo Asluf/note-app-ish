@@ -4,8 +4,8 @@ import { authenticateJWT } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.get('/getChats/:userId',authenticateJWT, getChats);
-router.get('/getUsers',authenticateJWT, getUsers);
-router.post('/createChat',authenticateJWT, createChat);
+router.get('/getChats/:userId',authenticateJWT, getChats);//fetch first time
+router.get('/getUsers',authenticateJWT, getUsers); //for create new chat get users
+router.post('/createChat',authenticateJWT, createChat); 
 
 export default router;

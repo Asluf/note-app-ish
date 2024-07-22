@@ -10,6 +10,7 @@ const signup = async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 12);
         const user = new User({ email, password: hashedPassword, username:username });
         await user.save();
+        //creating socket
         const userSocket = new UserSocket({userId:user._id});
         await userSocket.save();
         res.send({ success: true, message: "User created" });

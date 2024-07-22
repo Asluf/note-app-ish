@@ -14,6 +14,7 @@ export const getChats = async (req: Request, res: Response) => {
             .populate('user2', 'username')
             .lean();
 
+//limit message length
         chats.forEach(chat => {
             const unreadMessages = chat.messages.filter(message => message.receiverId.toString() === userId && !message.readReceipt);
             let messageCount = unreadMessages.length + 20;
@@ -34,6 +35,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+//whden clicking person  new chat created
 export const createChat = async (req: Request, res: Response): Promise<void> => {
     try {
         const chat = new Chat({
@@ -43,6 +45,7 @@ export const createChat = async (req: Request, res: Response): Promise<void> => 
         });
 
         await chat.save();
+        //getting from db again that usernames
         const savedChat = await Chat.findById(chat._id)
             .populate('user1', 'username')
             .populate('user2', 'username');

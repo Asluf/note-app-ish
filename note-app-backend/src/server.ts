@@ -28,7 +28,7 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
-  }
+  },
 });
 
 mongoose.set("strictQuery", true);
@@ -41,46 +41,50 @@ app.use("/api", noteRoutes);
 app.use("/auth", authRoutes);
 app.use("/chat", chatRoutes);
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   console.log(`New user connected: ${socket.id}`);
 
-  socket.on('register', async (userId) => {
+  socket.on("register", async (userId) => {
     try {
       let user = await UserSocket.findOne({ userId: userId });
+      //creating new user socket with userid and socket id
       if (!user) {
         user = new UserSocket({ userId: userId, socketId: socket.id });
       } else {
-        user.socketId = socket.id;
+        user.socketId = socket.id; //for existing user
       }
       await user.save();
       console.log(`User registered: ${userId} with socket ID: ${socket.id}`);
     } catch (error) {
-      console.error('Error registering user:', error);
+      console.error("Error registering user:", error);
     }
   });
 
-  socket.on('disconnect', async () => {
+  socket.on("disconnect", async () => {
     try {
-      console.log('User disconnected: ' + socket.id);
+      console.log("User disconnected: " + socket.id);
       const user = await UserSocket.findOne({ socketId: socket.id });
       if (user) {
         user.socketId = null;
         await user.save();
       }
     } catch (error) {
-      console.error('Error handling disconnect:', error);
+      console.error("Error handling disconnect:", error);
     }
   });
 
-  socket.on('send_message', async (data: IMessage) => {
+  socket.on("send_message", async (data: IMessage) => {
     try {
+
+      //find chat
       let chat = await Chat.findOne({
         $or: [
           { user1: data.senderId, user2: data.receiverId },
-          { user1: data.receiverId, user2: data.senderId }
-        ]
+          { user1: data.receiverId, user2: data.senderId },
+        ],
       });
 
+      //already chat is there
       if (chat) {
         chat.timestamp = new Date();
         chat.messages.push(data);
@@ -88,14 +92,15 @@ io.on('connection', (socket) => {
         chat = new Chat({
           user1: data.senderId,
           user2: data.receiverId,
-          messages: [data]
+          messages: [data],
         });
       }
-
+      //save chat
       const savedChat = await chat.save();
+      //populating username
       const newChat = await Chat.findById(savedChat._id)
-        .populate('user1', 'username')
-        .populate('user2', 'username');
+        .populate("user1", "username")
+        .populate("user2", "username");
 
       const newMessage = newChat?.messages[newChat.messages.length - 1];
 
@@ -113,26 +118,30 @@ io.on('connection', (socket) => {
       if (user && user.socketId) {
         io.to(user.socketId).emit('receive_message', { newMessage, newChatWithoutMessages });
       }
-
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
   });
 
-  socket.on('mark_as_read', async (data: { chatId: string, receiverId: string }) => {
-    try {
-      const selectedChat = await Chat.findById(data.chatId);
-      if (!selectedChat) {
-        throw new Error('Chat not found');
-      }
-
-      selectedChat.messages = selectedChat.messages.map(message => {
-        if (message.receiverId.toString() === data.receiverId && !message.readReceipt) {
-          message.readReceipt = true;
+  socket.on(
+    "mark_as_read",
+    async (data: { chatId: string; receiverId: string }) => {
+      try {
+        const selectedChat = await Chat.findById(data.chatId);
+        if (!selectedChat) {
+          throw new Error("Chat not found");
         }
-        return message;
-      });
-      await selectedChat.save();
+
+        selectedChat.messages = selectedChat.messages.map((message) => {
+          if (
+            message.receiverId.toString() === data.receiverId &&
+            !message.readReceipt
+          ) {
+            message.readReceipt = true;
+          }
+          return message;
+        });
+        await selectedChat.save();
 
       const senderId = selectedChat.user1.toString() === data.receiverId ? selectedChat.user2 : selectedChat.user1;
       const user = await UserSocket.findOne({ userId: senderId });
@@ -141,11 +150,8 @@ io.on('connection', (socket) => {
       if (user && user.socketId) {
         io.to(user.socketId).emit('receive_marked_as_read', data);
       }
-
-    } catch (error) {
-      console.error('Error in updating read receipt:', error);
     }
-  });
+  );
 });
 
 server.listen(PORT, () => {

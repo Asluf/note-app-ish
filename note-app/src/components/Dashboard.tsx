@@ -42,7 +42,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const socket = io('http://localhost:8080');
-    socketRef.current = socket;
+    socketRef.current = socket; 
 
     socket.on('connect', () => {
       console.log('Connected to server with userId:', userId);
