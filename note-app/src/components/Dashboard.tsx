@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
       socket.emit('register', userId);
     });
 
-    socket.on('receive_message', (data) => {
+    socket.on('receive_message', (data:any) => {
       console.log('Message received:', data);
       notificationSound.play();
 
