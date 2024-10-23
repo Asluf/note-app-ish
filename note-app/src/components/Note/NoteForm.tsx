@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { NoteContext } from '../contexts/NoteContext';
+import { NoteContext } from '../../contexts/NoteContext';
 interface NoteFormProps {
   token: string | undefined;
 }

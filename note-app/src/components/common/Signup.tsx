@@ -1,22 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AuthService } from '../services/authService';
-import Swal from 'sweetalert2';
+import { AuthService } from '../../services/authService';
 import Navbar from './NavBar';
-import { useTokenContext } from '../contexts/TokenContext';
+import { useTokenContext } from '../../contexts/TokenContext';
+import { ChatContext } from '../../contexts/ChatContext';
 
 const Signup: React.FC = () => {
+
   const [email, setEmail] = useState('');
+  const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
-  const {token, setToken} = useTokenContext();
+  const { token, setToken, setUserId } = useTokenContext();
+  const chatContext = useContext(ChatContext);
+  if (!chatContext) {
+    throw new Error("NoteList must be used within a NoteProvider");
+  }
+  const { showErrorToast, showSuccessToast } = chatContext;
 
   useEffect(() => {
     if (token || token !== '') {
       localStorage.clear();
       setToken('');
+      setUserId('');
     }
   }, []);
 
@@ -24,47 +32,29 @@ const Signup: React.FC = () => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Passwords do not match.",
-        showConfirmButton: false,
-        timer: 1500
-      });
+      showErrorToast('Passwords do not match!')
       return;
     }
     try {
-      const response = await AuthService.signup(email, password);
-      console.log('Signup successful:', response.data);
-      // Optionally, you can redirect or show a success message here
-      Swal.fire({
-        icon: 'success',
-        title: 'Signup Successful!',
-        text: 'You have successfully signed up.',
-      }).then((result) => {
-        // Redirect to dashboard after successful signup
-        if (result.isConfirmed || result.isDismissed) {
-          window.location.href = '/dashboard'; // Redirect using window location
-          // You can also use history.push('/dashboard') if you have access to history
-        }
-      });
+      const response = await AuthService.signup(email, password, userName);
+      if (response.data.success) {
+        showSuccessToast('You have successfully signed-up');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+
+      }
     } catch (error) {
       console.error('Signup error:', error);
       setError('Signup failed. Please try again.');
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Signup failed. Please try again.",
-        showConfirmButton: false,
-        timer: 1500
-      });
+      showErrorToast('Sign-up failed. Please try again.');
     }
   };
 
   return (
     <div className="w-[100%] h-[100vh]">
       {/* Navbar */}
-      <Navbar path={location.pathname}/>
+      <Navbar path={location.pathname} />
       <div className="w-[100%] h-[92vh] flex justify-center items-center">
         <div className="bg-brown-300 bg-opacity-50 w-[450px] h-[400px] rounded-xl px-10 py-5 shadow-xl flex flex-col gap-4 ">
           <h2 className="font-bold text-2xl flex justify-center items-center">Sign-up</h2>
@@ -77,6 +67,17 @@ const Signup: React.FC = () => {
                 className="w-[80%] py-2 px-3 rounded-lg bg-brown-100"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex w-[100%] gap-2 mb-6 items-center">
+              <label htmlFor="email" className="w-[20%]">Username</label>
+              <input
+                type="text"
+                id="username"
+                className="w-[80%] py-2 px-3 rounded-lg bg-brown-100"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
                 required
               />
             </div>

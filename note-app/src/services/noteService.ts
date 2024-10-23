@@ -1,22 +1,10 @@
 import axios from "axios";
 import { Note } from "../models/note";
 import { AppResponse } from "../models/response";
-import { useTokenContext } from "../contexts/TokenContext";
 
 export class NoteService {
   private static API_URL = "http://localhost:8080/api/notes";
-
-  private static token: any;
-
-  constructor() {
-    console.log('setting token');
-    this.initializeToken();
-  }
-
-  private async initializeToken(): Promise<void> {
-    const { token } = useTokenContext();
-    NoteService.token = token;
-  }
+ 
 
   public static async getNotesInitial(token: string): Promise<any> {
     // const url= `${this.API_URL}/getnotes`;

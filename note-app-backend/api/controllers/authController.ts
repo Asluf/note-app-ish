@@ -2,13 +2,17 @@ import { Request, Response } from 'express';
 import User from '../models/userModel';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import UserSocket from '../models/userSocketModel';
 
 const signup = async (req: Request, res: Response) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, username } = req.body;
         const hashedPassword = await bcrypt.hash(password, 12);
-        const user = new User({ email, password: hashedPassword });
+        const user = new User({ email, password: hashedPassword, username:username });
         await user.save();
+        //creating socket
+        const userSocket = new UserSocket({userId:user._id});
+        await userSocket.save();
         res.send({ success: true, message: "User created" });
     } catch (error) {
         res.send({ success: false, message: "An unknown error occurred" });   
@@ -27,8 +31,7 @@ const login = async (req: Request, res: Response) => {
             return res.send({ success: false, message: "Invalid password"}); 
         }
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-        console.log(token);
-        res.send({ success: true, token: token });
+        res.send({ success: true, token: token, userId:user._id });
     } catch (error) {
         res.send({ success: false, message: "An unknown error occurred" });
     }

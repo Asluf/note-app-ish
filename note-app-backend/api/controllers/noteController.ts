@@ -6,10 +6,7 @@ const isError = (error: unknown): error is Error => {
   return error instanceof Error;
 };
 
-export const createNote = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createNote = async (req: Request, res: Response): Promise<void> => {
   try {
     const { content } = req.body;
     const userId = req.user._id; // Get user ID from the request
@@ -47,7 +44,7 @@ export const updateNote = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.user._id; 
+    const userId = req.user._id;
     const noteId = req.params.id;
     const note = await Note.findOne({ _id: noteId, user: userId });
     if (!note) {

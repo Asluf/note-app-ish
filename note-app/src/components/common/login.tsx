@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AuthService } from "../services/authService";
-import { NoteContext } from "../contexts/NoteContext";
-import Swal from "sweetalert2";
+import { AuthService } from "../../services/authService";
+import { NoteContext } from "../../contexts/NoteContext";
 import Navbar from "./NavBar";
-import { useTokenContext } from "../contexts/TokenContext";
+import { useTokenContext } from "../../contexts/TokenContext";
+import { ChatContext } from "../../contexts/ChatContext";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -12,13 +12,18 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, setToken } = useTokenContext();
+  const { token, setToken, setUserId } = useTokenContext();
   const noteContext = useContext(NoteContext);
-
   if (!noteContext) {
     throw new Error("NoteList must be used within a NoteProvider");
   }
   const { fetchProjectInitial, fetchProject } = noteContext;
+
+  const chatContext = useContext(ChatContext);
+  if (!chatContext) {
+    throw new Error("NoteList must be used within a NoteProvider");
+  }
+  const { showErrorToast } = chatContext;
 
   useEffect(() => {
     if (token && token !== '') {
@@ -32,21 +37,21 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const response = await AuthService.login(email, password);
+      if (!response.data.success) {
+        showErrorToast('Login failed. Please check your credentials!')
+        return
+      }
       const tk = response.data.token;
+      const userId = response.data.userId;
       setToken(tk);
+      setUserId(userId);
       localStorage.setItem('token', tk);
+      localStorage.setItem('userId', userId);
       fetchProjectInitial(tk);
       navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
       setError("Login failed. Please check your credentials.");
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Login failed. Please check your credentials.",
-        showConfirmButton: false,
-        timer: 1500
-      });
     }
   };
 

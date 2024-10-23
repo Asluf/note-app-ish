@@ -1,4 +1,4 @@
-export interface Note{
-    _id:string;
-    content:string;
-  }
+export interface Note {
+  _id: string;
+  content: string;
+}
